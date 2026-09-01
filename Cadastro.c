@@ -13,6 +13,7 @@ typedef struct {
 // Funções obrigatórias (você define os parâmetros)
 void adicionar_produto(Produto **estoque, int *total_produtos) {
     char buffer_nome[100];
+    char preco_str[20];
     float preco_temp;
     int quantidade_temp;
 
@@ -20,8 +21,15 @@ void adicionar_produto(Produto **estoque, int *total_produtos) {
     printf("Nome: ");
     scanf(" %[^\n]", buffer_nome);
     printf("Preco: ");
-    scanf("%f", &preco_temp);
+    scanf("%19s", preco_str);
     
+    for (int i = 0; preco_str[i] != '\0'; i++) {
+        if (preco_str[i] == ',') {
+            preco_str[i] = '.';
+        }
+    }
+    preco_temp = atof(preco_str);
+
     printf("Quantidade: ");
     scanf("%d", &quantidade_temp);
 
@@ -56,39 +64,104 @@ void adicionar_produto(Produto **estoque, int *total_produtos) {
     printf("Produto adicionado com codigo %d!\n", (*estoque)[indice].codigo);
 
 }
-void listar_produtos(...);
+void listar_produtos(Produto *estoque, int total_produtos){
+    if (total_produtos == 0){
+        printf("Nenhum produto cadastrado,\n");
+        return;
+    }
+
+    printf("\n--- Lista de Produtos ---\n");
+    printf("+--------+--------------------+----------+------+---------------+\n");
+    printf("| Codigo | Nome               | Preco    | Qtd  | Valor Estoque |\n");
+    printf("+--------+--------------------+----------+------+---------------+\n");
+
+    float valor_total_estoque = 0;
+
+    for (int i = 0; i < total_produtos; i++){
+        float valor_estoque = estoque[i].preco * estoque[i].quantidade;
+        valor_total_estoque += valor_estoque;
+
+        printf("| %6d | %-18s | %8.2f | %4d | %13.2f |\n",
+               estoque[i].codigo,
+               estoque[i].nome,
+               estoque[i].preco,
+               estoque[i].quantidade,
+               valor_estoque);
+    }
+
+    printf("+--------+--------------------+----------+------+---------------+\n");
+    printf("Valor total do estoque: R$ %.2f\n", valor_total_estoque);
+
+}
 Produto* buscar_produto(...);
 void atualizar_estoque(...);
 void remover_produto(...);
 void liberar_memoria(...);
 
 int main() {
-    // INICIALIZAÇÃO CRÍTICA:
-    // O ponteiro deve começar como NULL. Assim, quando o realloc rodar pela primeira vez, 
-    // ele vai entender que precisa se comportar igual a um malloc comum.
     Produto *estoque = NULL; 
     int total_produtos = 0;
+    int opcao;
 
-    printf("=== TESTE DO SISTEMA ===\n");
+    do {
+        // Imprime o cabeçalho idêntico à imagem
+        printf("\n========================================\n");
+        printf("    SISTEMA DE CADASTRO DE PRODUTOS\n");
+        printf("========================================\n\n");
+        printf("Menu:\n");
+        printf("1. Adicionar produto\n");
+        printf("2. Listar produtos\n");
+        printf("3. Buscar produto\n");
+        printf("4. Atualizar estoque\n");
+        printf("5. Remover produto\n");
+        printf("6. Sair\n\n");
+        
+        printf("Opcao: ");
+        scanf("%d", &opcao);
 
-    // Vamos adicionar 2 produtos para testar.
-    // Usamos '&' para passar o ENDEREÇO da memória (ponteiros) para a função.
-    adicionar_produto(&estoque, &total_produtos);
-    adicionar_produto(&estoque, &total_produtos);
+        switch (opcao) {
+            case 1:
+                adicionar_produto(&estoque, &total_produtos);
+                break;
+            
+            case 2:
+                listar_produtos(estoque, total_produtos);
+                break;
+            
+            case 3:
+                // TODO: Implementar a função buscar_produto
+                printf("\n[Em desenvolvimento] Busca de produtos...\n");
+                break;
+            
+            case 4:
+                // TODO: Implementar a função atualizar_estoque
+                printf("\n[Em desenvolvimento] Atualizacao de estoque...\n");
+                break;
+            
+            case 5:
+                // TODO: Implementar a função remover_produto
+                printf("\n[Em desenvolvimento] Remocao de produto...\n");
+                break;
+            
+            case 6:
+                printf("\nLiberando memoria...\n");
+                
+                // TODO: Idealmente, moveremos isso para uma função void liberar_memoria(Produto *estoque, int total)
+                for (int i = 0; i < total_produtos; i++) {
+                    printf("Memoria do produto \"%s\" liberada.\n", estoque[i].nome);
+                    free(estoque[i].nome); // Libera o nome alocado com malloc
+                }
+                free(estoque); // Libera o vetor alocado com realloc
+                printf("Vetor de produtos liberado.\n");
+                
+                printf("Programa encerrado.\n");
+                break;
+            
+            default:
+                printf("\nOpcao invalida! Digite um numero entre 1 e 6.\n");
+        }
 
-    // Um "mini" listar produtos improvisado só para provar que salvou:
-    printf("\n--- VERIFICACAO DO QUE FOI SALVO ---\n");
-    for (int i = 0; i < total_produtos; i++) {
-        printf("Cod: %d | Nome: %s | Preco: %.2f | Qtd: %d\n", 
-               estoque[i].codigo, estoque [i].nome, estoque[i].preco, estoque[i].quantidade);
-    }
+    } while (opcao != 6);
 
-    // Mini limpeza de memória improvisada (depois faremos uma função oficial para isso)
-    for (int i = 0; i < total_produtos; i++) {
-        free(estoque[i].nome); // Libera o nome de cada produto
-    }
-    free(estoque); // Libera o vetor principal
-
-    printf("\nMemoria liberada e programa encerrado com sucesso.\n");
     return 0;
 }
