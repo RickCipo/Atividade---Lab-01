@@ -56,7 +56,35 @@ void adicionar_produto(Produto **estoque, int *total_produtos) {
     printf("Produto adicionado com codigo %d!\n", (*estoque)[indice].codigo);
 
 }
-void listar_produtos(...);
+void listar_produtos(Produto *estoque, int total_produtos){
+    if (total_produtos == 0){
+        printf("Nenhum produto cadastrado,\n");
+        return;
+    }
+
+    printf("\n--- Lista de Produtos ---\n");
+    printf("+--------+--------------------+----------+------+---------------+\n");
+    printf("| Codigo | Nome               | Preco    | Qtd  | Valor Estoque |\n");
+    printf("+--------+--------------------+----------+------+---------------+\n");
+
+    float valor_total_estoque = 0;
+
+    for (int i = 0 i < total_produtos; i++){
+        float valor_estoque = estoque[i].preco * estoque[i].quantidade;
+        valor_total_estoque += valor_estoque;
+
+        printf("| %6d | %-18s | %8.2f | %4d | %13.2f |\n",
+               estoque[i].codigo,
+               estoque[i].nome,
+               estoque[i].preco,
+               estoque[i].quantidade,
+               valor_estoque);
+    }
+
+    printf("+--------+--------------------+----------+------+---------------+\n");
+    printf("Valor total do estoque: R$ %.2f\n", valor_total_estoque);
+
+}
 Produto* buscar_produto(...);
 void atualizar_estoque(...);
 void remover_produto(...);
