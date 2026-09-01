@@ -93,8 +93,39 @@ void listar_produtos(Produto *estoque, int total_produtos){
     printf("Valor total do estoque: R$ %.2f\n", valor_total_estoque);
 
 }
-Produto* buscar_produto(...);
-void atualizar_estoque(...);
+
+Produto* buscar_produto(Produto *estoque, int total_produtos, int codigo){
+    for(int i = 0; i < total_produtos; i++){
+        if (estoque[i].codigo == codigo){
+            return &estoque[i];
+        }
+    }
+    return NULL;
+}
+
+void atualizar_estoque(Produto *estoque, int total_produtos){
+    int codigo;
+    int nova_quantidade;
+
+    printf("Codigo do produto: \n");
+    scanf("%d", &codigo);
+
+    Produto *produto = buscar_produto(estoque, total_produtos, codigo);
+
+    if (produto == NULL){
+        printf("Produto com codigo %d nao encontrado.\n", codigo);
+        return;
+    }
+
+    printf("Produto encontrado: %s (quantidade atual: %d)\n", produto->nome, produto->quantidade);
+
+    printf("Nova quantidade: ");
+    scanf("%d", &nova_quantidade);
+
+    produto->quantidade = nova_quantidade;
+    printf("Estoque atualizado com sucesso!\n");
+
+}
 void remover_produto(...);
 void liberar_memoria(...);
 
@@ -128,14 +159,33 @@ int main() {
                 listar_produtos(estoque, total_produtos);
                 break;
             
-            case 3:
-                // TODO: Implementar a função buscar_produto
-                printf("\n[Em desenvolvimento] Busca de produtos...\n");
+            case 3: 
+                int codigo_busca;
+                printf("Codigo do produto: \n");
+                scanf("%d", &codigo_busca);
+
+                Produto *encontrado = buscar_produto(estoque, total_produtos, codigo_busca);
+
+                if(encontrado != NULL){
+
+                    printf("+--------+--------------------+----------+------+\n");
+                    printf("| Codigo | Nome               | Preco    | Qtd  |\n");
+                    printf("+--------+--------------------+----------+------+\n");
+
+                    printf("| %6d | %-18s | %8.2f | %4d |\n",
+                        encontrado->codigo,
+                        encontrado->nome,
+                        encontrado->preco,
+                        encontrado->quantidade);
+                    printf("+--------+--------------------+----------+------+\n");
+                }else{
+                    printf("Produto %d não encontrado", codigo_busca);
+                }
+            
                 break;
             
             case 4:
-                // TODO: Implementar a função atualizar_estoque
-                printf("\n[Em desenvolvimento] Atualizacao de estoque...\n");
+                atualizar_estoque(estoque, total_produtos);
                 break;
             
             case 5:
