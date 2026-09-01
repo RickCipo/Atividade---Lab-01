@@ -126,8 +126,75 @@ void atualizar_estoque(Produto *estoque, int total_produtos){
     printf("Estoque atualizado com sucesso!\n");
 
 }
-void remover_produto(...);
-void liberar_memoria(...);
+void remover_produto(Produto **estoque, int *total_produtos) {
+    int codigo;
+
+    printf("\n--- Remover Produto ---\n");
+    printf("Codigo do produto a ser removido: ");
+    scanf("%d", &codigo);
+
+    Produto *produto = buscar_produto(*estoque, *total_produtos, codigo);
+
+    if (produto == NULL) {
+        printf("Produto com codigo %d nao encontrado.\n", codigo);
+        return;
+    }
+
+    int indice = produto - *estoque;
+
+    printf("Produto encontrado: %s\n", produto->nome);
+
+    free(produto->nome);
+    produto->nome = NULL;
+
+    for (int i = indice; i < (*total_produtos) - 1; i++) {
+        (*estoque)[i] = (*estoque)[i + 1];
+    }
+
+
+    (*total_produtos)--;
+
+    
+    if (*total_produtos == 0) {
+        free(*estoque);
+        *estoque = NULL;
+    } else {
+        Produto *novo_estoque = realloc(
+            *estoque,
+            (*total_produtos) * sizeof(Produto)
+        );
+
+        if (novo_estoque != NULL) {
+            *estoque = novo_estoque;
+        } else {
+            printf("Aviso: nao foi possivel reduzir o tamanho do vetor.\n");
+            printf("Os produtos continuam armazenados corretamente.\n");
+        }
+    }
+
+    printf("Produto removido com sucesso!\n");
+}
+
+void liberar_memoria(Produto *estoque, int total_produtos) {
+    printf("\nLiberando memoria...\n");
+
+    for (int i = 0; i < total_produtos; i++) {
+        if (estoque[i].nome != NULL) {
+            printf("Memoria do produto \"%s\" liberada.\n",
+                   estoque[i].nome);
+
+            free(estoque[i].nome);
+            estoque[i].nome = NULL;
+        }
+    }
+
+    // Depois libera o vetor
+    free(estoque);
+
+    printf("Vetor de produtos liberado.\n");
+    printf("Memoria liberada com sucesso!\n");
+    printf("Programa encerrado.\n");
+}
 
 int main() {
     Produto *estoque = NULL; 
@@ -159,7 +226,7 @@ int main() {
                 listar_produtos(estoque, total_produtos);
                 break;
             
-            case 3: 
+            case 3: { 
                 int codigo_busca;
                 printf("Codigo do produto: \n");
                 scanf("%d", &codigo_busca);
@@ -181,7 +248,7 @@ int main() {
                 }else{
                     printf("Produto %d não encontrado", codigo_busca);
                 }
-            
+            }
                 break;
             
             case 4:
@@ -189,22 +256,13 @@ int main() {
                 break;
             
             case 5:
-                // TODO: Implementar a função remover_produto
-                printf("\n[Em desenvolvimento] Remocao de produto...\n");
+                remover_produto(&estoque, &total_produtos);
                 break;
             
             case 6:
                 printf("\nLiberando memoria...\n");
                 
-                // TODO: Idealmente, moveremos isso para uma função void liberar_memoria(Produto *estoque, int total)
-                for (int i = 0; i < total_produtos; i++) {
-                    printf("Memoria do produto \"%s\" liberada.\n", estoque[i].nome);
-                    free(estoque[i].nome); // Libera o nome alocado com malloc
-                }
-                free(estoque); // Libera o vetor alocado com realloc
-                printf("Vetor de produtos liberado.\n");
-                
-                printf("Programa encerrado.\n");
+                liberar_memoria( estoque, total_produtos);
                 break;
             
             default:
